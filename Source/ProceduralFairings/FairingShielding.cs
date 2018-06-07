@@ -198,21 +198,20 @@ namespace Keramzit
                 return;
             }
 
-            //  Get all parts in range.
-
-            var parts = new List<Part>();
-
-            var colliders = Physics.OverlapSphere (part.transform.TransformPoint (lookupCenter), lookupRad, 1);
-
-            for (int i = colliders.Length - 1; i >= 0; --i)
+            //  Get all parts for vessel or editor ship, using Collider may not work in Flight for parts with special collision handling
+            List<Part> parts;
+            if (HighLogic.LoadedSceneIsFlight && ! vessel.packed)
             {
-                var p = colliders [i].gameObject.GetComponentUpwards<Part>();
-
-                if (p != null)
-                {
-                    parts.AddUnique (p);
-                }
+                parts = vessel.parts;
             }
+            else if (HighLogic.LoadedSceneIsEditor && EditorLogic.fetch.ship != null)
+            {
+                parts = EditorLogic.fetch.ship.parts;
+            }
+            else
+            {
+                return; 
+            }         
 
             //  Filter parts.
 
